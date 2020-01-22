@@ -38,9 +38,9 @@ import java.util.Random;
  * one of them is chosen randpmly during rewriting. This abstract class sketches the management of 
  * the random-number generator {@link #RND} that extending classes can use. 
  * The {@link #resetRandomGenerator()}  method resets the generator, so 
- * that {@link #applyRules(java.util.Iterator, int)},  
+ * that {@link #applyRules(Iterator, int)},
  * {@link #tell(lindenmayer.Turtle, lindenmayer.Symbol, int) } 
- * and {@link #getBoundingBox(lindenmayer.Turtle, java.util.Iterator, int) } can 
+ * and {@link #getBoundingBox(lindenmayer.Turtle, Iterator, int) } can
  * give matching results across multiple calls. 
  * 
  * @author Mikl&oacute;s Cs&#369;r&ouml;s
@@ -127,7 +127,7 @@ public abstract class AbstractLSystem
      */
     protected void readJSONFile(String filename, Turtle turtle) throws java.io.IOException
     {
-        throw new java.lang.UnsupportedOperationException("If you want this you have to implement it.");
+        throw new UnsupportedOperationException("If you want this you have to implement it.");
     }
  
     /**

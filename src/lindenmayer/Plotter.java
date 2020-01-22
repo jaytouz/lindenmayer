@@ -65,7 +65,7 @@ public class Plotter
         String axiom = params.getString("axiom");
         lsystem.setAxiom(axiom);
         
-        CODE A INSERER
+        //CODE A INSERER
         
         /* autres paramètres pour lsystem: 
            lsystem.addSymbol, lsystem.setAction, lsystem.addRule
@@ -89,7 +89,7 @@ public class Plotter
             if ("-o".equals(arg_key))
             {
                 String output_file = args[arg_idx++];
-                out = "=".equals(output_file)?System.out:new java.io.PrintStream(output_file);
+                out = "=".equals(output_file)?System.out:new PrintStream(output_file);
             } else 
             {
                 throw new IllegalArgumentException("Switch "+arg_key+" not recognized (-o output.ps)");

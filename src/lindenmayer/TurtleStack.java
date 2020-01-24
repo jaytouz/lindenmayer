@@ -3,25 +3,30 @@ package lindenmayer;
 import java.awt.geom.Point2D;
 import java.util.Stack;
 
-public class TurtleStack implements Turtle {
+public class TurtleStack implements Turtle{
     Stack<State> memory; //Stack les états de la tortue
-    State state;
+    State currentState;
 
-    private class State{
+    private class State {
         double posX;
         double posY;
         double teta;
-        private State(double x, double y, double t){
+
+        private State(double x, double y, double t) {
             posX = x;
             posY = y;
             teta = t;
         }
-        private State(){};
+
+        private State() {
+        }
+        ;
     }
 
-    public TurtleStack(){
+
+    public TurtleStack() {
         memory = new Stack<State>();
-        state = new State();
+        currentState = new State();
     }
 
     @Override
@@ -46,7 +51,7 @@ public class TurtleStack implements Turtle {
 
     @Override
     public void push() {
-        memory.push(state);
+        memory.push(currentState);
     }
 
     @Override
@@ -78,7 +83,6 @@ public class TurtleStack implements Turtle {
     public void setUnits(double step, double delta) {
 
     }
-
 
 
     public static void main(String[] args) {

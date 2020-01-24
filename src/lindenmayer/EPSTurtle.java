@@ -60,7 +60,7 @@ public class EPSTurtle implements Turtle
     
     public void plot(LSystem lsystem, int n_iter)
     {
-        ghost.push(); // save its position for computing BoundingBox
+        ghost.push(); // scomplave its position for computing BoundingBox
         Iterator<Symbol> axiom = lsystem.getAxiom();
         while (axiom.hasNext())
         {

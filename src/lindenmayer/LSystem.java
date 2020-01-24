@@ -9,6 +9,10 @@ public class LSystem {
     /**
      * constructeur vide monte un système avec alphabet vide et sans règles
      */
+
+    //TODO Map<char, Symbol> qui est le lien entre les caractères lus et le Symbol associé
+    //TODO Map<Symbol, List<Iterator>> qui est le lien entre le Symbol et sa règle associée
+
     public LSystem(){};
     /* méthodes d'initialisation de système */
     public Symbol addSymbol(char sym) {return new Symbol();}
@@ -26,6 +30,12 @@ public class LSystem {
         for (int i=0; i<alphabet.length(); i++){
             String letter = alphabet.getString(i);
             Symbol sym = system.addSymbol(letter.charAt(0)); // un caractère
+
+            /*TODO On lit le JSON file et on en extrait les données. Le char va dans notre objet Map<char, Symbol>, qui
+            sert à lier les caratères de l'alphabet à leur bonne action. Ensuite, pour pouvoir stocker les règles,
+            on associe un SYMBOL avec sa règle, qui va dans notre Map<Symbol, List<Iterator>>.
+            --JE PENSE-- qu'on call les méthodes addRule(), setAction(), etc. à partir de readJSONFile lorsqu'on
+            extrait les données associés. Pas sûr tho.*/
     }
 
     /* accès aux règles et exécution */

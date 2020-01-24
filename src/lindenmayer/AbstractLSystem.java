@@ -30,14 +30,14 @@ import java.util.Random;
  * 
  * <p><strong>Using the L-system. </strong>
  * The implementation provides access to symbols as instances of {@link Symbol}, and 
- * to sequences as <code>Iterator&lt;Symbol&gt;</code>. (Note that implementing classes do not 
- * need to store an actual backing list or array for the iterator, but could calculate 
- * {@link Iterator#next() } on the fly.) 
- * 
- * <p><strong>Random rewriting. </strong>. If multiple rules have the same left-hand side, then 
- * one of them is chosen randpmly during rewriting. This abstract class sketches the management of 
- * the random-number generator {@link #RND} that extending classes can use. 
- * The {@link #resetRandomGenerator()}  method resets the generator, so 
+ * to sequences as Iterator<Symbol>. (Note that implementing classes do not
+ * need to store an actual backing list or array for the iterator, but could calculate
+ * {@link Iterator#next() } on the fly.)
+ *
+ * <p><strong>Random rewriting. </strong>. If multiple rules have the same left-hand side, then
+ * one of them is chosen randomly during rewriting. This abstract class sketches the management of
+ * the random-number generator {@link #RND} that extending classes can use.
+ * The {@link #resetRandomGenerator()}  method resets the generator, so
  * that {@link #applyRules(Iterator, int)},
  * {@link #tell(lindenmayer.Turtle, lindenmayer.Symbol, int) } 
  * and {@link #getBoundingBox(lindenmayer.Turtle, Iterator, int) } can

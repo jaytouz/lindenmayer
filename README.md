@@ -17,3 +17,6 @@ JSON REPO JAVA : https://github.com/stleary/JSON-java
 Documentation : http://stleary.github.io/JSON-java/index.html
 
 L'amour des plantes : http://algorithmicbotany.org/papers/abop/abop.pdf
+
+Lien vers le repo du prof pour le code de départ : https://github.com/csurosm/IFT2015-H20
+

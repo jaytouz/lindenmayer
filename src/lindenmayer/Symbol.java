@@ -21,6 +21,11 @@ package lindenmayer;
  * @author Mikl&oacute;s Cs&#369;r&ouml;s
  */
 public class Symbol {
-    /*TODO Symbol contient deux choses: un char et un ArrayList<String>. Le char contient le caractère lu par le
-    JSON file, et l'array contient l'ACTION (pas la règle) associée à ce caractère. Par exemple: "F: draw". */
+    char caractere;
+    String action;
+
+    public Symbol(char sym) {
+        caractere = sym;
+    }
+
 }

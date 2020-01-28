@@ -1,25 +1,49 @@
 package lindenmayer;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class LSystem extends AbstractLSystem{ // Il faut que ca extends, parce qu'on doit utiser randomNumberGenerator
+public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce qu'on doit utiser randomNumberGenerator
+    private Map<Character, Symbol> symbols;
+    private Map<Symbol, List<Iterator>> rules; //Je suis pas sûr si private ou non...
+    private String axiom;
+
     /**
      * constructeur vide monte un système avec alphabet vide et sans règles
      */
 
     //TODO Map<char, Symbol> qui est le lien entre les caractères lus et le Symbol associé
     //TODO Map<Symbol, List<Iterator>> qui est le lien entre le Symbol et sa règle associée
+    public LSystem() {
+    }
 
-    public LSystem(){};
+    ;
+
     /* méthodes d'initialisation de système */
-    public Symbol addSymbol(char sym) {return new Symbol();}
-    public void addRule(Symbol sym, String expansion) {}
-    public void setAction(Symbol sym, String action) {}
-    public void setAxiom(String str){}
+    public Symbol addSymbol(char sym) {
+        Symbol newSymbol = new Symbol(sym);
+        symbols.put(sym, newSymbol);
+        return newSymbol;
+    }
+
+    public void addRule(Symbol sym, String expansion) {
+    //Comment on utilise iterator??
+    }
+
+    public void setAction(Symbol sym, String action) {
+        symbols.get(sym).action = action;
+    }
+
+    public void setAxiom(String str) {
+        axiom = str;
+    }
 
 
     /* initialisation par fichier */
@@ -41,22 +65,34 @@ public class LSystem extends AbstractLSystem{ // Il faut que ca extends, parce q
     }
 
     /* accès aux règles et exécution */
-    public Iterator getAxiom(){}
-    public Iterator rewrite(Symbol sym) {}
-    public void tell(Turtle turtle, Symbol sym) {}
+    public Iterator getAxiom() {
+        return rules.get(axiom).iterator(); //vrm pas sûr
+    }
+
+    public Iterator rewrite(Symbol sym) {
+        
+    }
+
+    public void tell(Turtle turtle, Symbol sym) {
+    }
 
     /* opérations avancées */
-    public Iterator applyRules(Iterator seq, int n) {}
-    public void tell(Turtle turtle, Symbol sym, int rounds){}
-    public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {}
+    public Iterator applyRules(Iterator seq, int n) {
+    }
+
+    public void tell(Turtle turtle, Symbol sym, int rounds) {
+    }
+
+    public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
+    }
 
 
     public static void main(String[] args) {
         LSystem ls = new LSystem();
         Turtle t = new GhostTurtle();
-        try{
+        try {
             ls.readJSONFile("/sample_json/buisson.json", ls, t);
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }

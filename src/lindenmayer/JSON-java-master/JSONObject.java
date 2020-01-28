@@ -761,7 +761,7 @@ public class JSONObject {
      * @throws JSONException
      *             if the key is not found or if the value is not a JSONArray.
      */
-    public JSONArray getJSONArray(String key) throws JSONException {
+    public org.json.JSONArray getJSONArray(String key) throws JSONException {
         Object object = this.get(key);
         if (object instanceof JSONArray) {
             return (JSONArray) object;

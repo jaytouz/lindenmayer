@@ -69,12 +69,14 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
     /* initialisation par fichier */
     public static void readJSONFile(String filename, LSystem system, Turtle turtle) throws java.io.IOException {
         JSONObject input = new JSONObject(new JSONTokener(new java.io.FileReader(filename))); // lecture de fichier JSON avec JSONTokener
+        //ALPHABET + RULES + ACTIONS
         JSONArray alphabet = input.getJSONArray("alphabet");
-        String axiom = input.getString("axiom");
-        system.setAxiom(axiom);
+
+
         for (int i = 0; i < alphabet.length(); i++) {
             String letter = alphabet.getString(i);
             Symbol sym = system.addSymbol(letter.charAt(0)); // un caractère
+
 
             /*TODO On lit le JSON file et on en extrait les données. Le char va dans notre objet Map<char, Symbol>, qui
             sert à lier les caratères de l'alphabet à leur bonne action. Ensuite, pour pouvoir stocker les règles,
@@ -82,6 +84,12 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
             --JE PENSE-- qu'on call les méthodes addRule(), setAction(), etc. à partir de readJSONFile lorsqu'on
             extrait les données associés. Pas sûr tho.*/
         }
+        //RULES
+
+        //AXIOM
+        String axiom = input.getString("axiom");
+        system.setAxiom(axiom);
+
     }
 
     /* accès aux règles et exécution */
@@ -94,7 +102,9 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
             if (rules.get(sym).size() == 1) {
                 return rules.get(sym).get(0);
             } else {
-                //TODO au hasard
+                int bound_size = rules.get(sym).size();
+                int rnd_idx_rule = RND.nextInt(bound_size);
+                return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
             }
         }
         return null;
@@ -122,6 +132,7 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
 
     /* opérations avancées */
     public Iterator applyRules(Iterator seq, int n) {
+
     }
 
     public void tell(Turtle turtle, Symbol sym, int rounds) {

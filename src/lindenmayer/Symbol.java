@@ -21,11 +21,10 @@ package lindenmayer;
  * @author Mikl&oacute;s Cs&#369;r&ouml;s
  */
 public class Symbol {
-    char caractere;
+    char sym;
     String action;
 
-    public Symbol(char sym) {
-        caractere = sym;
+    public Symbol(char sym) { this.sym = sym;
     }
 
 }

@@ -1,5 +1,6 @@
 package lindenmayer;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,15 +14,12 @@ import org.json.JSONTokener;
 
 public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce qu'on doit utiser randomNumberGenerator
     private Map<Character, Symbol> symbols;
-    private Map<Symbol, List<Iterator>> rules; //Je suis pas sûr si private ou non...
+    private Map<Symbol, List<Iterator>> rules;
     private ArrayList<Symbol> axiom = new ArrayList<Symbol>();
 
     /**
      * constructeur vide monte un système avec alphabet vide et sans règles
      */
-
-    //TODO Map<char, Symbol> qui est le lien entre les caractères lus et le Symbol associé
-    //TODO Map<Symbol, List<Iterator>> qui est le lien entre le Symbol et sa règle associée
     public LSystem() {
     }
 
@@ -36,14 +34,12 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
 
     //On appelle la méthode à chaque fois qu'on rajoute une règle. S'il n'y a pas de règle associé au symbole envoyé on
     //initialise le tout. S'il y en a déjà une, on la rajoute parmi ses règles associées.
-    //TODO change string to symbol?
     public void addRule(Symbol sym, String expansion) {
-        ArrayList<String> receivedRule = new ArrayList<String>(); //Une des règles associée au symbole
+        ArrayList<String> receivedRule = new ArrayList<String>(); //TODO Je crois que ca doit etre une liste de symbole (JT)
         ArrayList<Iterator> multipleRules = new ArrayList<Iterator>(); //La liste de toutes les règles associées au symbole
         for (int i = 0; i < expansion.length(); i++) {
             receivedRule.add(expansion.charAt(i) + ""); //On transforme le String reçu en ArrayList
         }
-
         if (!rules.containsKey(sym)) {
             multipleRules.add(receivedRule.iterator());
             rules.put(sym, multipleRules);
@@ -65,30 +61,46 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         axiom = receivedSymbol;
     }
 
-
+    //TODO verifier s'il y a tous les elements necessaires dans la methode readJSONfile.
     /* initialisation par fichier */
     public static void readJSONFile(String filename, LSystem system, Turtle turtle) throws java.io.IOException {
         JSONObject input = new JSONObject(new JSONTokener(new java.io.FileReader(filename))); // lecture de fichier JSON avec JSONTokener
-        //ALPHABET + RULES + ACTIONS
+        //get data from input json
         JSONArray alphabet = input.getJSONArray("alphabet");
+        JSONObject rules = input.getJSONObject("rules");
+        String axiom = input.getString("axiom");
+        JSONObject actions = input.getJSONObject("actions");
+        JSONObject parameters = input.getJSONObject("parameters");
 
+        // Add data to LSysteme
 
+        // add alphabet
         for (int i = 0; i < alphabet.length(); i++) {
             String letter = alphabet.getString(i);
             Symbol sym = system.addSymbol(letter.charAt(0)); // un caractère
 
-
-            /*TODO On lit le JSON file et on en extrait les données. Le char va dans notre objet Map<char, Symbol>, qui
-            sert à lier les caratères de l'alphabet à leur bonne action. Ensuite, pour pouvoir stocker les règles,
-            on associe un SYMBOL avec sa règle, qui va dans notre Map<Symbol, List<Iterator>>.
-            --JE PENSE-- qu'on call les méthodes addRule(), setAction(), etc. à partir de readJSONFile lorsqu'on
-            extrait les données associés. Pas sûr tho.*/
+            //RULES
+            if (rules.has(letter)){
+                //si la lettre a une JSONARRAY comme regle, ajouter chaque element
+                int num_rules = rules.getJSONArray(letter).length();
+                for(int j=0; i<num_rules; j++){
+                    // on ajoute toutes les règles associés
+                    String expansion = (String) rules.getJSONArray(letter).get(j); // expansion
+                    system.addRule(sym, expansion);
+                }
+            }
         }
-        //RULES
 
         //AXIOM
-        String axiom = input.getString("axiom");
         system.setAxiom(axiom);
+
+        //Parameter //TODO je suis pas sur si ca doit etre int ou double (JT)
+        double xIni = (double) parameters.getJSONArray("start").get(0);
+        double yIni = (double) parameters.getJSONArray("start").get(1);
+        double tetaIni = (double) parameters.getJSONArray("start").get(2);
+
+        turtle.init(new Point2D.Double(xIni, yIni), tetaIni);
+        turtle.setUnits((double) parameters.get("step"), (double) parameters.get("angle"));
 
     }
 

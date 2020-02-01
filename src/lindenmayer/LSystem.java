@@ -80,10 +80,10 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
             Symbol sym = system.addSymbol(letter.charAt(0)); // un caractère
 
             //RULES
-            if (rules.has(letter)){
+            if (rules.has(letter)) {
                 //si la lettre a une JSONARRAY comme regle, ajouter chaque element
                 int num_rules = rules.getJSONArray(letter).length();
-                for(int j=0; i<num_rules; j++){
+                for (int j = 0; i < num_rules; j++) {
                     // on ajoute toutes les règles associés
                     String expansion = (String) rules.getJSONArray(letter).get(j); // expansion
                     system.addRule(sym, expansion);
@@ -94,7 +94,7 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         //AXIOM
         system.setAxiom(axiom);
 
-        //Parameter //TODO je suis pas sur si ca doit etre int ou double (JT)
+        //Parameter //TODO je suis pas sur si ca doit etre int ou double (JT). Je crois que c'est double pour les positions (LVP)
         double xIni = (double) parameters.getJSONArray("start").get(0);
         double yIni = (double) parameters.getJSONArray("start").get(1);
         double tetaIni = (double) parameters.getJSONArray("start").get(2);
@@ -143,11 +143,44 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
     }
 
     /* opérations avancées */
-    public Iterator applyRules(Iterator seq, int n) {
+    //Ici j'ai rajouté des <Symbol> à côté des Iterator, commme dans AbstractLSystem pour pouvoir faire ce que j'ai fait
+    //Peut-être que ça va fuck up quelque part
+    public Iterator applyRules(Iterator<Symbol> seq, int n) {
+        ArrayList<Symbol> newAxiom = new ArrayList<Symbol>();
 
+        for (int i = 0; i < n; i++) {                             //Nombre de générations
+            while (seq.hasNext()) {                               //À chaque gen, on itère à travers la séquence de départ
+                Symbol nextSymbol = seq.next();
+                Iterator<Symbol> temp = this.rewrite(nextSymbol);
+                if (temp != null) {
+                    while (temp.hasNext()) {                      //On itère à travers la règle reçue
+                        newAxiom.add(temp.next());
+                    }
+                } else {
+                    newAxiom.add(nextSymbol);
+                }
+            }
+            seq = newAxiom.iterator();                            //On crée la séquence de départ de la prochaine gen
+            newAxiom.clear();
+        }
+
+        return seq;                                               //Gen finale
     }
 
+    //C'est vraiment complexe
     public void tell(Turtle turtle, Symbol sym, int rounds) {
+        ArrayList<Symbol> temp = new ArrayList<Symbol>();
+        temp.add(sym);
+        if (rounds == 0) {
+            tell(turtle, sym);
+
+        } else {
+            Iterator<Symbol> itr = applyRules(temp.iterator(), 1);
+            while (itr.hasNext()) {
+                tell(turtle, itr.next(), rounds - 1);
+            }
+        }
+
     }
 
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {

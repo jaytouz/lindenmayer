@@ -16,11 +16,13 @@
 package lindenmayer;
 
 
-import java.awt.geom.Point2D;
-import java.io.PrintStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.awt.geom.Point2D;
+import java.io.PrintStream;
+
 
 /**
  *
@@ -65,12 +67,8 @@ public class Plotter
         String axiom = params.getString("axiom");
         lsystem.setAxiom(axiom);
         
-        //CODE A INSERER
-        
-        /* autres paramètres pour lsystem: 
-           lsystem.addSymbol, lsystem.setAction, lsystem.addRule
-        */
-    }    
+
+    }
     
     /**
      * Instance-linked main. 
@@ -106,16 +104,19 @@ public class Plotter
         this.lsystem = new LSystem();
         this.turtle = new EPSTurtle(new GhostTurtle(), out);
         
-        JSONObject params = new JSONObject(new JSONTokener(new java.io.FileReader(json_file)));
-        parseLSystem(params);      
+//        JSONObject params = new JSONObject(new JSONTokener(new java.io.FileReader(json_file)));
+//        parseLSystem(params);
+        lsystem.readJSONFile(args[0], turtle);
         
         turtle.plot(lsystem, n_iter);
     }
     
     public static void main(String[] args) throws Exception
     {
+        String[] arg = new String[] {"src/lindenmayer/sample_json/plante.json", "3"}; //file, generations
+        System.out.println(arg[0]);
         Plotter P = new Plotter();
-        P.allezallez(args);
+        P.allezallez(arg);
     }
     
     

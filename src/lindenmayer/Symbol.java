@@ -27,4 +27,11 @@ public class Symbol {
     public Symbol(char sym) { this.sym = sym;
     }
 
+    @Override
+    public String toString() {
+        return "Symbol{" +
+                "sym=" + sym +
+                ", action='" + action + '\'' +
+                '}';
+    }
 }

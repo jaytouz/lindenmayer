@@ -187,4 +187,11 @@ public class EPSTurtle implements Turtle
         ghost.setUnits(step, delta);
         
     }
+
+    @Override
+    public String toString() {
+        return "EPSTurtle{" +
+                "ghost=" + ghost +
+                '}';
+    }
 }

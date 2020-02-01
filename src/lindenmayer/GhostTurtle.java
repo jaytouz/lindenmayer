@@ -30,6 +30,15 @@ public class GhostTurtle implements Turtle {
         }
 
         private State() {};
+
+        @Override
+        public String toString() {
+            return "State{" +
+                    "posX=" + posX +
+                    ", posY=" + posY +
+                    ", teta=" + teta +
+                    '}';
+        }
     }
 
 
@@ -152,6 +161,15 @@ public class GhostTurtle implements Turtle {
         this.delta = delta;
     }
 
+    @Override
+    public String toString() {
+        return "GhostTurtle{" +
+                "memory=" + memory +
+                ", currentState=" + currentState +
+                ", step=" + step +
+                ", delta=" + delta +
+                '}';
+    }
 
     public static void main(String[] args) {
         GhostTurtle t = new GhostTurtle();

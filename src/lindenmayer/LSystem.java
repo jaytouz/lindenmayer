@@ -2,19 +2,16 @@ package lindenmayer;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce qu'on doit utiser randomNumberGenerator
-    private Map<Character, Symbol> symbols;
-    private Map<Symbol, List<Iterator>> rules;
+public class LSystem extends AbstractLSystem {
+    private Map<Character, Symbol> symbols = new HashMap<Character, Symbol>();
+    private Map<Symbol, List<Iterator>> rules = new HashMap<Symbol, List<Iterator>>();
     private ArrayList<Symbol> axiom = new ArrayList<Symbol>();
 
     /**
@@ -25,20 +22,34 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
 
     ;
 
-    /* méthodes d'initialisation de système */
+    /**
+     * Registers a new character in the alphabet. This method is called while parsing
+     * the input (specifying the alphabet for the L-system).
+     *
+     * @param sym character used in the input to denote this symbol
+     * @return the corresponding {@link Symbol} in the alphabet
+     */
     public Symbol addSymbol(char sym) {
         Symbol newSymbol = new Symbol(sym);
         symbols.put(sym, newSymbol);
         return newSymbol;
     }
 
-    //On appelle la méthode à chaque fois qu'on rajoute une règle. S'il n'y a pas de règle associé au symbole envoyé on
-    //initialise le tout. S'il y en a déjà une, on la rajoute parmi ses règles associées.
+    /**
+     * Adds a new rule to the grammar. This method is called while parsing the input.
+     * Symbols on the right-hand side are encoded by
+     * <code>char</code>s in the same way as in {@link #addSymbol(char)}. It is allowed to
+     * add the same rule more than once - each one is stored as an alternative.
+     *
+     * @param sym       symbol on left-hand side that is rewritten by this rule
+     * @param expansion sequence on right-hand side
+     */
     public void addRule(Symbol sym, String expansion) {
-        ArrayList<String> receivedRule = new ArrayList<String>(); //TODO Je crois que ca doit etre une liste de symbole (JT)
+        ArrayList<Symbol> receivedRule = new ArrayList<Symbol>();
         ArrayList<Iterator> multipleRules = new ArrayList<Iterator>(); //La liste de toutes les règles associées au symbole
         for (int i = 0; i < expansion.length(); i++) {
-            receivedRule.add(expansion.charAt(i) + ""); //On transforme le String reçu en ArrayList
+            char letter = expansion.charAt(i); //on recherche la lettre de l'expansion.
+            receivedRule.add(symbols.get(letter)); //On ajoute le symbol correspondant
         }
         if (!rules.containsKey(sym)) {
             multipleRules.add(receivedRule.iterator());
@@ -49,10 +60,27 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
 
     }
 
+    /**
+     * Associates a turtle action with a symbol. This method is called while parsing the input.
+     * The action must correspond to one of the methods in {@link Turtle}: {@link Turtle#draw() }, {@link Turtle#move() },
+     * {@link Turtle#turnL() }, {@link Turtle#turnR}, {@link Turtle#stay}, {@link Turtle#pop() }, {@link Turtle#push() }.
+     *
+     * @param sym    a symbol corresponding to a turtle action
+     * @param action a turtle action
+     */
     public void setAction(Symbol sym, String action) {
         symbols.get(sym.sym).action = action;
     }
 
+    /**
+     * Defines the starting sequence for the L-system.
+     * This method is called when parsing the input.
+     * <p>
+     * Symbols are encoded by <code>char</code>s as in
+     * {@link #addSymbol(char) }.
+     *
+     * @param str starting sequence
+     */
     public void setAxiom(String str) {
         ArrayList<Symbol> receivedSymbol = new ArrayList<Symbol>();
         for (int i = 0; i < str.length(); i++) {
@@ -61,9 +89,11 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         axiom = receivedSymbol;
     }
 
-    //TODO verifier s'il y a tous les elements necessaires dans la methode readJSONfile.
-    /* initialisation par fichier */
-    public static void readJSONFile(String filename, LSystem system, Turtle turtle) throws java.io.IOException {
+    /**
+     * Initializes this instance from a file. Implementing classes may prefer a static
+     * method.
+     */
+    public void readJSONFile(String filename, Turtle turtle) throws java.io.IOException {
         JSONObject input = new JSONObject(new JSONTokener(new java.io.FileReader(filename))); // lecture de fichier JSON avec JSONTokener
         //get data from input json
         JSONArray alphabet = input.getJSONArray("alphabet");
@@ -77,38 +107,51 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         // add alphabet
         for (int i = 0; i < alphabet.length(); i++) {
             String letter = alphabet.getString(i);
-            Symbol sym = system.addSymbol(letter.charAt(0)); // un caractère
+            Symbol sym = addSymbol(letter.charAt(0)); // un caractère
+            //ACTION
+            setAction(sym, actions.getString(letter));
 
             //RULES
             if (rules.has(letter)) {
                 //si la lettre a une JSONARRAY comme regle, ajouter chaque element
                 int num_rules = rules.getJSONArray(letter).length();
-                for (int j = 0; i < num_rules; j++) {
+                for (int j = 0; j < num_rules; j++) {
                     // on ajoute toutes les règles associés
                     String expansion = (String) rules.getJSONArray(letter).get(j); // expansion
-                    system.addRule(sym, expansion);
+                    addRule(sym, expansion);
                 }
             }
         }
-
         //AXIOM
-        system.setAxiom(axiom);
+        setAxiom(axiom);
 
         //Parameter //TODO je suis pas sur si ca doit etre int ou double (JT). Je crois que c'est double pour les positions (LVP)
-        double xIni = (double) parameters.getJSONArray("start").get(0);
-        double yIni = (double) parameters.getJSONArray("start").get(1);
-        double tetaIni = (double) parameters.getJSONArray("start").get(2);
+        double xIni = parameters.getJSONArray("start").getDouble(0);
+        double yIni = parameters.getJSONArray("start").getDouble(1);
+        double tetaIni = parameters.getJSONArray("start").getDouble(2);
 
         turtle.init(new Point2D.Double(xIni, yIni), tetaIni);
-        turtle.setUnits((double) parameters.get("step"), (double) parameters.get("angle"));
-
+        turtle.setUnits(parameters.getDouble("step"), parameters.getDouble("angle"));
     }
 
-    /* accès aux règles et exécution */
+    /**
+     * Starting sequence.
+     *
+     * @return starting sequence
+     */
     public Iterator getAxiom() {
         return axiom.iterator();
     }
 
+    /**
+     * Applies a symbol's rewriting rule.
+     * If no rule was previously stored with {@link #addRule}, then it returns null. If a single rule
+     * was given, it uses the rule's right-hand side. If multiple rules were given ({@link #addRule} called with the same
+     * {@link Symbol} argument more than once), then one of them is chosen randomly.
+     *
+     * @param sym a symbol that would be rewritten.
+     * @return null if no rule, or one of the applicable rules chosen randomly
+     */
     public Iterator rewrite(Symbol sym) {
         if (!rules.get(sym).isEmpty()) {
             if (rules.get(sym).size() == 1) {
@@ -122,6 +165,12 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         return null;
     }
 
+    /**
+     * Executes the action corresponding to a symbol (specified by {@link #setAction}) on a given turtle.
+     *
+     * @param turtle used for executing the action
+     * @param sym    symbol that needs to be executed
+     */
     public void tell(Turtle turtle, Symbol sym) {
         switch (sym.action) {
             case "draw":
@@ -142,19 +191,25 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         }
     }
 
-    /* opérations avancées */
-    //Ici j'ai rajouté des <Symbol> à côté des Iterator, commme dans AbstractLSystem pour pouvoir faire ce que j'ai fait
-    //Peut-être que ça va fuck up quelque part
+    /**
+     * Calculates the result of multiple rounds of rewriting. Symbols with no reriting rules are simply copied
+     * at each round.
+     *
+     * @param seq starting sequence
+     * @param n   number of rounds
+     * @return sequence obtained after rewriting the entire sequence <var>n</var> times
+     */
     public Iterator applyRules(Iterator<Symbol> seq, int n) {
         ArrayList<Symbol> newAxiom = new ArrayList<Symbol>();
 
         for (int i = 0; i < n; i++) {                             //Nombre de générations
             while (seq.hasNext()) {                               //À chaque gen, on itère à travers la séquence de départ
                 Symbol nextSymbol = seq.next();
-                Iterator<Symbol> temp = this.rewrite(nextSymbol);
+                Iterator<Symbol> temp = rewrite(nextSymbol);
                 if (temp != null) {
                     while (temp.hasNext()) {                      //On itère à travers la règle reçue
-                        newAxiom.add(temp.next());
+                        Symbol s = temp.next();
+                        newAxiom.add(s);
                     }
                 } else {
                     newAxiom.add(nextSymbol);
@@ -167,7 +222,15 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
         return seq;                                               //Gen finale
     }
 
-    //C'est vraiment complexe
+    /**
+     * Draws the result after multiple rounds of rewriting, starting from a single symbol.
+     * Symbols with no rewriting rules are simply copied
+     * at each round.
+     *
+     * @param turtle turtle used for drawing
+     * @param sym    the starting sequence in round 0: a single symbol
+     * @param rounds number of rounds
+     */
     public void tell(Turtle turtle, Symbol sym, int rounds) {
         ArrayList<Symbol> temp = new ArrayList<Symbol>();
         temp.add(sym);
@@ -175,26 +238,38 @@ public class LSystem extends AbstractLSystem { // Il faut que ca extends, parce 
             tell(turtle, sym);
 
         } else {
-            Iterator<Symbol> itr = applyRules(temp.iterator(), 1);
+            Iterator<Symbol> itr = applyRules(temp.iterator(), 1); //(JT) est-ce que ca ne devrait pas commencer a n et diminuer par a chaque appel recursif?? a tester
             while (itr.hasNext()) {
                 tell(turtle, itr.next(), rounds - 1);
             }
         }
 
+
     }
 
+    /**
+     * Calculates the rectangle that would bound the drawing after multiple rounds of rewriting.
+     *
+     * @param turtle turtle used for drawing
+     * @param seq    the starting sequence in round 0
+     * @param n      number of rounds
+     * @return bounding box (union of all visited turtle positions)
+     */
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
-    }
-
-
-    public static void main(String[] args) {
-        LSystem ls = new LSystem();
-        Turtle t = new GhostTurtle();
-        try {
-            ls.readJSONFile("/sample_json/buisson.json", ls, t);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+//        double width = 0;
+//        double heigth = 0;
+//        Rectangle2D bbox = new Rectangle2D.Double(0, 0, width, heigth);
+//
+//        if (n==0){
+//            width = turtle.getPosition().getX();
+//            heigth = turtle.getPosition().getY();
+//            Rectangle2D bbox_next = new Rectangle2D.Double(0, 0, width, heigth);
+//            return bbox;
+//        }else {
+//
+//        }
+        Rectangle2D bbox = new Rectangle2D.Double(0, 0, 1000, 1000);
+        return bbox;
     }
 }
 

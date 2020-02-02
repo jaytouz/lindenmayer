@@ -100,12 +100,13 @@ public class Plotter
         if (arg_idx==args.length)
             throw new IllegalArgumentException("Give number of rewriting iterations as the last command-line argument: java ... "+getClass().getName()+" lsystem.json niter");
         int n_iter = Integer.parseInt(args[arg_idx++]);
+        System.out.println(n_iter+" iterations to be done");
 
         this.lsystem = new LSystem();
         this.turtle = new EPSTurtle(new GhostTurtle(), out);
         
-//        JSONObject params = new JSONObject(new JSONTokener(new java.io.FileReader(json_file)));
-//        parseLSystem(params);
+        JSONObject params = new JSONObject(new JSONTokener(new java.io.FileReader(json_file)));
+        parseLSystem(params);
         lsystem.readJSONFile(args[0], turtle);
         
         turtle.plot(lsystem, n_iter);

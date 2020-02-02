@@ -111,14 +111,18 @@ public class LSystem extends AbstractLSystem {
             //ACTION
             setAction(sym, actions.getString(letter));
 
-            //RULES
+        }
+
+        for (int i = 0; i < alphabet.length(); i++) {
+            String letter = alphabet.getString(i);
+
             if (rules.has(letter)) {
                 //si la lettre a une JSONARRAY comme regle, ajouter chaque element
                 int num_rules = rules.getJSONArray(letter).length();
                 for (int j = 0; j < num_rules; j++) {
                     // on ajoute toutes les règles associés
-                    String expansion = (String) rules.getJSONArray(letter).get(j); // expansion
-                    addRule(sym, expansion);
+                    String expansion = (String) rules.getJSONArray(letter).get(j); //TODO il y a un null ici but idk why
+                    addRule(symbols.get(letter), expansion);
                 }
             }
         }
@@ -235,11 +239,12 @@ public class LSystem extends AbstractLSystem {
         ArrayList<Symbol> temp = new ArrayList<Symbol>();
         temp.add(sym);
         if (rounds == 0) {
+            System.out.println("Is u here");
             tell(turtle, sym);
 
         } else {
             Iterator<Symbol> itr = applyRules(temp.iterator(), 1); //(JT) est-ce que ca ne devrait pas commencer a n et diminuer par a chaque appel recursif?? a tester
-            while (itr.hasNext()) {
+            while (itr.hasNext()) {                                   //TODO (LVP) Non, parce que sinon on fait trop de générations: àchaque génération on en fait alors n - 1 de trop
                 tell(turtle, itr.next(), rounds - 1);
             }
         }
@@ -256,19 +261,19 @@ public class LSystem extends AbstractLSystem {
      * @return bounding box (union of all visited turtle positions)
      */
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
-//        double width = 0;
-//        double heigth = 0;
-//        Rectangle2D bbox = new Rectangle2D.Double(0, 0, width, heigth);
-//
-//        if (n==0){
-//            width = turtle.getPosition().getX();
-//            heigth = turtle.getPosition().getY();
-//            Rectangle2D bbox_next = new Rectangle2D.Double(0, 0, width, heigth);
-//            return bbox;
-//        }else {
-//
-//        }
-        Rectangle2D bbox = new Rectangle2D.Double(0, 0, 1000, 1000);
+        double width = 0;
+        double heigth = 0;
+        Rectangle2D bbox = new Rectangle2D.Double(0, 0, width, heigth);
+
+        if (n == 0) {
+            width = turtle.getPosition().getX();
+            heigth = turtle.getPosition().getY();
+            Rectangle2D bbox_next = new Rectangle2D.Double(0, 0, width, heigth);
+            return bbox;
+        } else {
+
+        }
+        bbox = new Rectangle2D.Double(0, 0, 1000, 1000);
         return bbox;
     }
 }

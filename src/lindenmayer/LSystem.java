@@ -122,7 +122,7 @@ public class LSystem extends AbstractLSystem {
                 for (int j = 0; j < num_rules; j++) {
                     // on ajoute toutes les règles associés
                     String expansion = (String) rules.getJSONArray(letter).get(j); //TODO il y a un null ici but idk why
-                    addRule(symbols.get(letter), expansion);
+                    addRule(symbols.get(letter.charAt(0)), expansion);
                 }
             }
         }
@@ -157,7 +157,7 @@ public class LSystem extends AbstractLSystem {
      * @return null if no rule, or one of the applicable rules chosen randomly
      */
     public Iterator rewrite(Symbol sym) {
-        if (!rules.get(sym).isEmpty()) {
+        if (rules.get(sym) != null && !rules.get(sym).isEmpty()) {
             if (rules.get(sym).size() == 1) {
                 return rules.get(sym).get(0);
             } else {
@@ -219,8 +219,7 @@ public class LSystem extends AbstractLSystem {
                     newAxiom.add(nextSymbol);
                 }
             }
-            seq = newAxiom.iterator();                            //On crée la séquence de départ de la prochaine gen
-            newAxiom.clear();
+            seq = newAxiom.iterator();
         }
 
         return seq;                                               //Gen finale
@@ -243,8 +242,8 @@ public class LSystem extends AbstractLSystem {
             tell(turtle, sym);
 
         } else {
-            Iterator<Symbol> itr = applyRules(temp.iterator(), 1); //(JT) est-ce que ca ne devrait pas commencer a n et diminuer par a chaque appel recursif?? a tester
-            while (itr.hasNext()) {                                   //TODO (LVP) Non, parce que sinon on fait trop de générations: àchaque génération on en fait alors n - 1 de trop
+            Iterator<Symbol> itr = applyRules(temp.iterator(), 1);
+            while (itr.hasNext()) {
                 tell(turtle, itr.next(), rounds - 1);
             }
         }

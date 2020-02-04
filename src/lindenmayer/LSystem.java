@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import javax.sound.midi.Sequencer;
+
 public class LSystem extends AbstractLSystem {
     private Map<Character, Symbol> symbols = new HashMap<Character, Symbol>();
     private Map<Symbol, List<Iterator>> rules = new HashMap<Symbol, List<Iterator>>();
@@ -112,7 +114,7 @@ public class LSystem extends AbstractLSystem {
             setAction(sym, actions.getString(letter));
 
         }
-
+        //RULES
         for (int i = 0; i < alphabet.length(); i++) {
             String letter = alphabet.getString(i);
 
@@ -122,7 +124,7 @@ public class LSystem extends AbstractLSystem {
                 for (int j = 0; j < num_rules; j++) {
                     // on ajoute toutes les règles associés
                     String expansion = (String) rules.getJSONArray(letter).get(j); //TODO il y a un null ici but idk why
-                    addRule(symbols.get(letter), expansion);
+                    addRule(symbols.get(letter.charAt(0)), expansion);
                 }
             }
         }
@@ -157,14 +159,14 @@ public class LSystem extends AbstractLSystem {
      * @return null if no rule, or one of the applicable rules chosen randomly
      */
     public Iterator rewrite(Symbol sym) {
-        if (!rules.get(sym).isEmpty()) {
-            if (rules.get(sym).size() == 1) {
-                return rules.get(sym).get(0);
-            } else {
-                int bound_size = rules.get(sym).size();
-                int rnd_idx_rule = RND.nextInt(bound_size);
-                return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
-            }
+        if (rules.get(sym) != null && !rules.get(sym).isEmpty()) {
+//            if (rules.get(sym).size() == 1) {
+//                return rules.get(sym).get(0);
+//            } else {
+            int bound_size = rules.get(sym).size();
+            int rnd_idx_rule = RND.nextInt(bound_size);
+            return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
+
         }
         return null;
     }
@@ -205,25 +207,28 @@ public class LSystem extends AbstractLSystem {
      */
     public Iterator applyRules(Iterator<Symbol> seq, int n) {
         ArrayList<Symbol> newAxiom = new ArrayList<Symbol>();
-
-        for (int i = 0; i < n; i++) {                             //Nombre de générations
-            while (seq.hasNext()) {                               //À chaque gen, on itère à travers la séquence de départ
-                Symbol nextSymbol = seq.next();
-                Iterator<Symbol> temp = rewrite(nextSymbol);
-                if (temp != null) {
-                    while (temp.hasNext()) {                      //On itère à travers la règle reçue
-                        Symbol s = temp.next();
-                        newAxiom.add(s);
+        Iterator<Symbol> lastAxiom = seq;
+        if (n == 0) {
+            return seq;
+        } else {
+            for (int i = 0; i < n; i++) {                             //Nombre de générations
+                newAxiom.clear();
+                while (lastAxiom.hasNext()) {                               //À chaque gen, on itère à travers la séquence de départ
+                    Symbol nextSymbol = lastAxiom.next();
+                    Iterator<Symbol> temp = rewrite(nextSymbol);
+                    if (temp != null) {
+                        while (temp.hasNext()) {                      //On itère à travers la règle reçue
+                            Symbol s = temp.next();
+                            newAxiom.add(s);
+                        }
+                    } else {
+                        newAxiom.add(nextSymbol);
                     }
-                } else {
-                    newAxiom.add(nextSymbol);
                 }
+                lastAxiom = newAxiom.iterator();
             }
-            seq = newAxiom.iterator();                            //On crée la séquence de départ de la prochaine gen
-            newAxiom.clear();
+            return seq;                                               //Gen finale
         }
-
-        return seq;                                               //Gen finale
     }
 
     /**
@@ -236,20 +241,16 @@ public class LSystem extends AbstractLSystem {
      * @param rounds number of rounds
      */
     public void tell(Turtle turtle, Symbol sym, int rounds) {
-        ArrayList<Symbol> temp = new ArrayList<Symbol>();
-        temp.add(sym);
         if (rounds == 0) {
-            System.out.println("Is u here");
+            System.out.println("TELL - " + sym.sym);
             tell(turtle, sym);
 
         } else {
-            Iterator<Symbol> itr = applyRules(temp.iterator(), 1); //(JT) est-ce que ca ne devrait pas commencer a n et diminuer par a chaque appel recursif?? a tester
-            while (itr.hasNext()) {                                   //TODO (LVP) Non, parce que sinon on fait trop de générations: àchaque génération on en fait alors n - 1 de trop
+            Iterator<Symbol> itr = rewrite(sym);
+            while (itr.hasNext()) {
                 tell(turtle, itr.next(), rounds - 1);
             }
         }
-
-
     }
 
     /**
@@ -262,18 +263,26 @@ public class LSystem extends AbstractLSystem {
      */
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
         double width = 0;
-        double heigth = 0;
-        Rectangle2D bbox = new Rectangle2D.Double(0, 0, width, heigth);
+        double height = 0;
+        double x = 0;
+        double X = 0;
+        double y = 0;
+        double Y = 0;
 
-        if (n == 0) {
-            width = turtle.getPosition().getX();
-            heigth = turtle.getPosition().getY();
-            Rectangle2D bbox_next = new Rectangle2D.Double(0, 0, width, heigth);
-            return bbox;
-        } else {
-
+        Rectangle2D bbox = new Rectangle2D.Double(0, 0, X - x, Y - y);
+        Iterator<Symbol> seq_actions = applyRules(seq, n); //TODO APPLYRULES RETURN NOTHING.
+        while (seq_actions.hasNext()) {
+            System.out.println("in BBBOX");
+            Symbol sym = seq_actions.next();
+            tell(turtle, sym);
+            x = Math.min(x, turtle.getPosition().getX());
+            X = Math.max(X, turtle.getPosition().getX());
+            y = Math.min(y, turtle.getPosition().getY());
+            Y = Math.max(Y, turtle.getPosition().getY());
+            System.out.println(x + " " + X + " " + y + " " + Y);
+            bbox.createUnion(new Rectangle2D.Double(0, 0, X - x, Y - y));
         }
-        bbox = new Rectangle2D.Double(0, 0, 1000, 1000);
+
         return bbox;
     }
 }

@@ -54,7 +54,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void draw() {
-        System.out.println("Drawing while moving");
         currentState.posX += step * cos(currentState.teta);
         currentState.posY += step * sin(currentState.teta);
     }
@@ -65,7 +64,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void move() {
-        System.out.println("Moving without drawing");
         currentState.posX += step * cos(currentState.teta);
         currentState.posY += step * sin(currentState.teta);
     }
@@ -76,7 +74,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void turnR() {
-        System.out.println("Turning right");
         currentState.teta -= delta;
     }
 
@@ -86,7 +83,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void turnL() {
-        System.out.println("Turning left");
         currentState.teta -= delta;
     }
 
@@ -96,7 +92,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void push() {
-        System.out.println("Saving state (push)");
         memory.push(currentState);
     }
 
@@ -106,7 +101,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void pop() {
-        System.out.println("Getting next state (pop)"); //Est-ce que c'est l'etat suivant ou precedant?
         currentState = memory.pop();
     }
 
@@ -115,7 +109,7 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void stay() {
-        System.out.println("staying");
+
     }
 
     /**
@@ -125,7 +119,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void init(Point2D pos, double angle_deg) {
-        System.out.println("init ghost turtle");
         currentState = new State(pos.getX(), pos.getY(), angle_deg);
     }
 
@@ -135,7 +128,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public Point2D getPosition() {
-        System.out.println("getting pos2D from ghostTurle");
         Point2D pos = new Point2D.Double(currentState.posX, currentState.posY);
         return pos;
     }
@@ -146,7 +138,6 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public double getAngle() {
-        System.out.println("getting angle from ghostTurtle");
         return currentState.teta;
     }
 

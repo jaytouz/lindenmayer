@@ -176,16 +176,17 @@ public class LSystem extends AbstractLSystem {
     /**
      * Methode pour retourner une instance de l'iterateur comtenant la regle avec un compteur initialiser a zero.
      * Assure egalement que le compteur dans rules soit a zero apres l'utilisation de rewrite.
+     *
      * @param sym
      * @param idx_rules
      * @return iterator comptenant la regle associe au symbol.
      */
-    private Iterator<Symbol> getRule(Symbol sym, int idx_rules){
+    private Iterator<Symbol> getRule(Symbol sym, int idx_rules) {
         ArrayList<Symbol> copy_list_itr = new ArrayList<Symbol>();
         Iterator<Symbol> itr = rules.get(sym).get(idx_rules);
 
         //copier les elements de la regle
-        while(itr.hasNext()){
+        while (itr.hasNext()) {
             copy_list_itr.add(itr.next());
         }
         //remettre un iterateur dans rules avec un compteur a zero
@@ -229,13 +230,12 @@ public class LSystem extends AbstractLSystem {
      * @return sequence obtained after rewriting the entire sequence <var>n</var> times
      */
     public Iterator applyRules(Iterator<Symbol> seq, int n) {
-        ArrayList<Symbol> newAxiom = new ArrayList<Symbol>();
         Iterator<Symbol> lastAxiom = seq;
         if (n == 0) {
             return seq;
         } else {
             for (int i = 0; i < n; i++) {                             //Nombre de générations
-                newAxiom.clear();
+                ArrayList<Symbol> newAxiom = new ArrayList<Symbol>();
                 while (lastAxiom.hasNext()) {                               //À chaque gen, on itère à travers la séquence de départ
                     Symbol nextSymbol = lastAxiom.next();
                     Iterator<Symbol> temp = rewrite(nextSymbol);
@@ -250,7 +250,7 @@ public class LSystem extends AbstractLSystem {
                 }
                 lastAxiom = newAxiom.iterator();
             }
-            return seq;                                               //Gen finale
+            return lastAxiom;                                               //Gen finale
         }
     }
 
@@ -265,18 +265,16 @@ public class LSystem extends AbstractLSystem {
      */
     public void tell(Turtle turtle, Symbol sym, int rounds) {
         if (rounds == 0) {
-            System.out.println("TELL - " + sym.sym);
             tell(turtle, sym);
 
         } else {
-            System.out.println(sym + "--------------" + rounds);
             Iterator<Symbol> itr = rewrite(sym);
-            if (itr != null){
+            if (itr != null) {
                 while (itr.hasNext()) {
                     tell(turtle, itr.next(), rounds - 1);
                 }
-            }else{
-                tell(turtle, sym, rounds -1);
+            } else {
+                tell(turtle, sym, rounds - 1);
             }
 
 
@@ -294,23 +292,21 @@ public class LSystem extends AbstractLSystem {
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
         double width = 0;
         double height = 0;
-        double x = 0;
-        double X = 0;
-        double y = 0;
-        double Y = 0;
+        double minX = 0;
+        double maxX = 0;
+        double minY = 0;
+        double maxY = 0;
 
-        Rectangle2D bbox = new Rectangle2D.Double(0, 0, X - x, Y - y);
-        Iterator<Symbol> seq_actions = applyRules(seq, n); //TODO APPLYRULES RETURN NOTHING.
+        Rectangle2D bbox = new Rectangle2D.Double(0, 0, maxX - minX, maxY - minY);
+        Iterator<Symbol> seq_actions = applyRules(seq, n);
         while (seq_actions.hasNext()) {
-            System.out.println("in BBBOX");
             Symbol sym = seq_actions.next();
             tell(turtle, sym);
-            x = Math.min(x, turtle.getPosition().getX());
-            X = Math.max(X, turtle.getPosition().getX());
-            y = Math.min(y, turtle.getPosition().getY());
-            Y = Math.max(Y, turtle.getPosition().getY());
-            System.out.println(x + " " + X + " " + y + " " + Y);
-            bbox.createUnion(new Rectangle2D.Double(0, 0, X - x, Y - y));
+            minX = Math.min(minX, turtle.getPosition().getX());
+            maxX = Math.max(maxX, turtle.getPosition().getX());
+            minY = Math.min(minY, turtle.getPosition().getY());
+            maxY = Math.max(maxY, turtle.getPosition().getY());
+            bbox = bbox.createUnion(new Rectangle2D.Double(0, 0, maxX - minX, maxY - minY));
         }
 
         return bbox;

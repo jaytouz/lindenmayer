@@ -296,8 +296,10 @@ public class LSystem extends AbstractLSystem {
         double maxX = 0;
         double minY = 0;
         double maxY = 0;
+        double initialX = turtle.getPosition().getX();
+        double initialY = turtle.getPosition().getY();
 
-        Rectangle2D bbox = new Rectangle2D.Double(0, 0, maxX - minX, maxY - minY);
+        Rectangle2D bbox = new Rectangle2D.Double(initialX, initialY, maxX - minX, maxY - minY);
         Iterator<Symbol> seq_actions = applyRules(seq, n);
         while (seq_actions.hasNext()) {
             Symbol sym = seq_actions.next();
@@ -306,7 +308,10 @@ public class LSystem extends AbstractLSystem {
             maxX = Math.max(maxX, turtle.getPosition().getX());
             minY = Math.min(minY, turtle.getPosition().getY());
             maxY = Math.max(maxY, turtle.getPosition().getY());
-            bbox = bbox.createUnion(new Rectangle2D.Double(0, 0, maxX - minX, maxY - minY));
+            double largeur = maxX - minX;
+            double hauteur = maxY - minY;
+
+            bbox = bbox.createUnion(new Rectangle2D.Double(initialX - largeur / 2, initialY + hauteur / 2, largeur, hauteur));
         }
 
         return bbox;

@@ -114,7 +114,7 @@ public class Plotter
     
     public static void main(String[] args) throws Exception
     {
-        String[] arg = new String[] {"src/lindenmayer/sample_json/buisson.json", "2"}; //file, generations
+        String[] arg = new String[] {"src/lindenmayer/sample_json/buisson.json", "3"}; //file, generations
         System.out.println(arg[0]);
         Plotter P = new Plotter();
         P.allezallez(arg);

@@ -165,10 +165,33 @@ public class LSystem extends AbstractLSystem {
 //            } else {
             int bound_size = rules.get(sym).size();
             int rnd_idx_rule = RND.nextInt(bound_size);
-            return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
+            Iterator<Symbol> itr = getRule(sym, rnd_idx_rule);
 
+//            return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
+            return itr;
         }
         return null;
+    }
+
+    /**
+     * Methode pour retourner une instance de l'iterateur comtenant la regle avec un compteur initialiser a zero.
+     * Assure egalement que le compteur dans rules soit a zero apres l'utilisation de rewrite.
+     * @param sym
+     * @param idx_rules
+     * @return iterator comptenant la regle associe au symbol.
+     */
+    private Iterator<Symbol> getRule(Symbol sym, int idx_rules){
+        ArrayList<Symbol> copy_list_itr = new ArrayList<Symbol>();
+        Iterator<Symbol> itr = rules.get(sym).get(idx_rules);
+
+        //copier les elements de la regle
+        while(itr.hasNext()){
+            copy_list_itr.add(itr.next());
+        }
+        //remettre un iterateur dans rules avec un compteur a zero
+        rules.get(sym).set(idx_rules, copy_list_itr.iterator());
+
+        return copy_list_itr.iterator();
     }
 
     /**
@@ -246,10 +269,17 @@ public class LSystem extends AbstractLSystem {
             tell(turtle, sym);
 
         } else {
+            System.out.println(sym + "--------------" + rounds);
             Iterator<Symbol> itr = rewrite(sym);
-            while (itr.hasNext()) {
-                tell(turtle, itr.next(), rounds - 1);
+            if (itr != null){
+                while (itr.hasNext()) {
+                    tell(turtle, itr.next(), rounds - 1);
+                }
+            }else{
+                tell(turtle, sym, rounds -1);
             }
+
+
         }
     }
 

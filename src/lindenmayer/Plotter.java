@@ -16,9 +16,10 @@
 package lindenmayer;
 
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import lindenmayer.json_java.JSONArray;
+import lindenmayer.json_java.JSONObject;
+import lindenmayer.json_java.JSONTokener;
+
 
 import java.awt.geom.Point2D;
 import java.io.PrintStream;

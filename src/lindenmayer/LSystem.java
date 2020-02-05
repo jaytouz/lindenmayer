@@ -1,15 +1,15 @@
 package lindenmayer;
 
+import lindenmayer.json_java.JSONArray;
+import lindenmayer.json_java.JSONObject;
+import lindenmayer.json_java.JSONTokener;
+
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.*;
 import java.awt.geom.Rectangle2D;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import javax.sound.midi.Sequencer;
 
 public class LSystem extends AbstractLSystem {
     private Map<Character, Symbol> symbols = new HashMap<Character, Symbol>();

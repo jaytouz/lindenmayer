@@ -1,14 +1,17 @@
+/**
+ * @title Devoir 1 - IFT2015 - Hiv2020
+ * @author Louis-Vincent Poellhuber (p1234802 - 20161115)
+ * @author Jérémie Tousignant (p1038501 - TOUJ14059307)
+ */
+
 package lindenmayer;
 
 import lindenmayer.json_java.JSONArray;
 import lindenmayer.json_java.JSONObject;
 import lindenmayer.json_java.JSONTokener;
 
-import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.*;
 import java.awt.geom.Rectangle2D;
-
 
 
 public class LSystem extends AbstractLSystem {
@@ -102,7 +105,6 @@ public class LSystem extends AbstractLSystem {
         JSONObject rules = input.getJSONObject("rules");
         String axiom = input.getString("axiom");
         JSONObject actions = input.getJSONObject("actions");
-        JSONObject parameters = input.getJSONObject("parameters");
 
         // Add data to LSysteme
 
@@ -123,21 +125,13 @@ public class LSystem extends AbstractLSystem {
                 int num_rules = rules.getJSONArray(letter).length();
                 for (int j = 0; j < num_rules; j++) {
                     // on ajoute toutes les règles associés
-                    String expansion = (String) rules.getJSONArray(letter).get(j); //TODO il y a un null ici but idk why
+                    String expansion = (String) rules.getJSONArray(letter).get(j);
                     addRule(symbols.get(letter.charAt(0)), expansion);
                 }
             }
         }
         //AXIOM
         setAxiom(axiom);
-
-        //Parameter //TODO je suis pas sur si ca doit etre int ou double (JT). Je crois que c'est double pour les positions (LVP)
-        double xIni = parameters.getJSONArray("start").getDouble(0);
-        double yIni = parameters.getJSONArray("start").getDouble(1);
-        double tetaIni = parameters.getJSONArray("start").getDouble(2);
-
-        turtle.init(new Point2D.Double(xIni, yIni), tetaIni);
-        turtle.setUnits(parameters.getDouble("step"), parameters.getDouble("angle"));
     }
 
     /**
@@ -160,14 +154,9 @@ public class LSystem extends AbstractLSystem {
      */
     public Iterator rewrite(Symbol sym) {
         if (rules.get(sym) != null && !rules.get(sym).isEmpty()) {
-//            if (rules.get(sym).size() == 1) {
-//                return rules.get(sym).get(0);
-//            } else {
             int bound_size = rules.get(sym).size();
             int rnd_idx_rule = RND.nextInt(bound_size);
             Iterator<Symbol> itr = getRule(sym, rnd_idx_rule);
-
-//            return rules.get(sym).get(rnd_idx_rule); //Retourne une regle aleatoire borne par la taille de rules.
             return itr;
         }
         return null;
@@ -205,6 +194,9 @@ public class LSystem extends AbstractLSystem {
         switch (sym.action) {
             case "draw":
                 turtle.draw();
+                break;
+            case "move":
+                turtle.move();
                 break;
             case "push":
                 turtle.push();
@@ -276,8 +268,6 @@ public class LSystem extends AbstractLSystem {
             } else {
                 tell(turtle, sym, rounds - 1);
             }
-
-
         }
     }
 
@@ -290,16 +280,14 @@ public class LSystem extends AbstractLSystem {
      * @return bounding box (union of all visited turtle positions)
      */
     public Rectangle2D getBoundingBox(Turtle turtle, Iterator seq, int n) {
-        double width = 0;
-        double height = 0;
+        double largeur = 0;
+        double hauteur = 0;
         double minX = 0;
         double maxX = 0;
         double minY = 0;
         double maxY = 0;
-        double initialX = turtle.getPosition().getX();
-        double initialY = turtle.getPosition().getY();
+        Rectangle2D bbox;
 
-        Rectangle2D bbox = new Rectangle2D.Double(initialX, initialY, maxX - minX, maxY - minY);
         Iterator<Symbol> seq_actions = applyRules(seq, n);
         while (seq_actions.hasNext()) {
             Symbol sym = seq_actions.next();
@@ -308,11 +296,10 @@ public class LSystem extends AbstractLSystem {
             maxX = Math.max(maxX, turtle.getPosition().getX());
             minY = Math.min(minY, turtle.getPosition().getY());
             maxY = Math.max(maxY, turtle.getPosition().getY());
-            double largeur = maxX - minX;
-            double hauteur = maxY - minY;
-
-            bbox = bbox.createUnion(new Rectangle2D.Double(initialX - largeur / 2, initialY + hauteur / 2, largeur, hauteur));
+            largeur = maxX - minX;
+            hauteur = maxY - minY;
         }
+        bbox = new Rectangle2D.Double(minX, maxY, largeur, hauteur); //assumant que (0,0) est en haut a gauche.
 
         return bbox;
     }

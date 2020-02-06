@@ -1,6 +1,9 @@
+/**
+ * @title Devoir 1 - IFT2015 - Hiv2020
+ * @author Louis-Vincent Poellhuber (p1234802 - 20161115)
+ * @author Jérémie Tousignant (p1038501 - TOUJ14059307)
+ */
 package lindenmayer;
-
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Stack;
 
@@ -54,8 +57,8 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void draw() {
-        currentState.posX += step * cos(currentState.teta);
-        currentState.posY += step * sin(currentState.teta);
+        currentState.posX += step * cos(Math.toRadians(currentState.teta));
+        currentState.posY += step * sin(Math.toRadians(currentState.teta));
     }
 
     /**
@@ -64,8 +67,8 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void move() {
-        currentState.posX += step * cos(currentState.teta);
-        currentState.posY += step * sin(currentState.teta);
+        currentState.posX += step * cos(Math.toRadians(currentState.teta));
+        currentState.posY += step * sin(Math.toRadians(currentState.teta));
     }
 
     /**
@@ -83,7 +86,7 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void turnL() {
-        currentState.teta -= delta;
+        currentState.teta += delta;
     }
 
     /**
@@ -92,7 +95,11 @@ public class GhostTurtle implements Turtle {
      */
     @Override
     public void push() {
-        memory.push(currentState);
+        State toSave = new State();
+        toSave.posX = currentState.posX;
+        toSave.posY = currentState.posY;
+        toSave.teta = currentState.teta;
+        memory.push(toSave);
     }
 
     /**
@@ -160,9 +167,5 @@ public class GhostTurtle implements Turtle {
                 ", step=" + step +
                 ", delta=" + delta +
                 '}';
-    }
-
-    public static void main(String[] args) {
-        GhostTurtle t = new GhostTurtle();
     }
 }

@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @title Devoir 1 - IFT2015 - Hiv2020
+ * @author Louis-Vincent Poellhuber (p1234802 - 20161115)
+ * @author Jérémie Tousignant (p1038501 - TOUJ14059307)
+ */
 package lindenmayer;
 
 
@@ -45,10 +50,7 @@ public class Plotter
     private LSystem lsystem;
     private EPSTurtle turtle;
 
-    private Plotter()
-    {
-//        this(new LSystem(), new EPSTurtle());
-    }
+    private Plotter(){ }
     
     /**
      * Parses the JSON specification of an L-System. 
@@ -101,7 +103,6 @@ public class Plotter
         if (arg_idx==args.length)
             throw new IllegalArgumentException("Give number of rewriting iterations as the last command-line argument: java ... "+getClass().getName()+" lsystem.json niter");
         int n_iter = Integer.parseInt(args[arg_idx++]);
-        System.out.println(n_iter+" iterations to be done");
 
         this.lsystem = new LSystem();
         this.turtle = new EPSTurtle(new GhostTurtle(), out);
@@ -115,10 +116,9 @@ public class Plotter
     
     public static void main(String[] args) throws Exception
     {
-        String[] arg = new String[] {"src/lindenmayer/sample_json/buisson.json", "3"}; //file, generations
-        System.out.println(arg[0]);
+//        String[] argsc = new String[] {"src/lindenmayer/sierpinski.json", "5"};
         Plotter P = new Plotter();
-        P.allezallez(arg);
+        P.allezallez(args);
     }
     
     

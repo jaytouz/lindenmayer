@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @title Devoir 1 - IFT2015 - Hiv2020
+ * @author Louis-Vincent Poellhuber (p1234802 - 20161115)
+ * @author Jérémie Tousignant (p1038501 - TOUJ14059307)
+ */
 package lindenmayer;
 
 import java.awt.geom.Point2D;

@@ -5,3 +5,7 @@
 .idea
 *.iml
 .class
+test
+.eps
+.json
+META-INF
